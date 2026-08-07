@@ -296,11 +296,12 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
   }
 })();
 
-/* Embers behind the hero: pixel sparks drifting up off a dithered horizon —
-   the gradient drawn the way the game would draw it, in cells, not a wash.
-   Under reduced motion everything is painted once and left still. */
-(() => {
-  const cv = $('embers'), ctx = cv.getContext('2d');
+/* The sky: pixel sparks drifting up off a dithered horizon — the gradient
+   drawn the way the game would draw it, in cells, not a wash. The hero and
+   the join band each get one, so the page opens and closes on the same
+   world. Under reduced motion everything is painted once and left still. */
+function initSky(cv) {
+  const ctx = cv.getContext('2d');
   const COLORS = ['#FF6A3D', '#FF4D57', '#FFC857', '#6b4a75'];
   let W = 0, H = 0, sparks = [], horizon = null;
 
@@ -378,9 +379,11 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
   addEventListener('resize', () => { size(); paint(); });
   if (still) { paint(); return; }
 
-  /* Only burn frames while the hero is on screen. */
+  /* Only burn frames while this sky is on screen. */
   new IntersectionObserver(([e]) => {
     if (e.isIntersecting && !raf) frame();
     else if (!e.isIntersecting && raf) { cancelAnimationFrame(raf); raf = null; }
   }).observe(cv);
-})();
+}
+initSky($('embers'));
+initSky($('embers2'));
