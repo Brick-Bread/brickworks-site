@@ -231,6 +231,51 @@ section{padding-block:clamp(3rem,4.6vw,4.5rem)}
 .cube-l{fill:color-mix(in srgb,var(--c) 68%,#05060C)}
 .cube-r{fill:color-mix(in srgb,var(--c) 44%,#05060C)}
 
+/* Updates -------------------------------------------------------------- */
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px;
+  background:var(--edge);border:1px solid var(--edge);border-radius:6px;overflow:hidden}
+.entry{background:var(--night-2);padding:1.4rem 1.6rem;display:grid;
+  grid-template-columns:8.5rem minmax(0,1fr);gap:.35rem 1.5rem;align-items:baseline}
+.entry time{font-family:var(--mono);font-size:.85rem;color:var(--faint);white-space:nowrap}
+.entry h3{color:var(--white);font-size:1.1rem}
+.entry p{grid-column:2;color:var(--dim);font-size:.97rem}
+@media (max-width:640px){
+  .entry{grid-template-columns:1fr}
+  .entry p{grid-column:1}
+}
+
+/* Status --------------------------------------------------------------- */
+.svcs{list-style:none;margin:0;padding:0;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(15.5rem,1fr));gap:1rem}
+.svc{background:var(--panel);border-radius:6px;padding:1.35rem 1.5rem;
+  box-shadow:inset 0 0 0 1px var(--edge);display:flex;flex-direction:column;gap:.9rem}
+.svc-top{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.svc-name{font-family:var(--display);font-size:1.05rem;letter-spacing:.02em;
+  text-transform:uppercase;color:var(--white)}
+.dot-s{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--mono);
+  font-size:.78rem;color:var(--faint);white-space:nowrap}
+.dot-s::before{content:"";width:.55rem;height:.55rem;border-radius:50%;
+  background:var(--faint);flex:none}
+.svc[data-up="yes"] .dot-s{color:var(--grass)}
+.svc[data-up="yes"] .dot-s::before{background:var(--grass);
+  box-shadow:0 0 0 3px rgba(111,209,84,.18)}
+.svc[data-up="no"] .dot-s{color:var(--brick)}
+.svc[data-up="no"] .dot-s::before{background:var(--brick);
+  box-shadow:0 0 0 3px rgba(217,83,59,.18)}
+.svc dl{margin:0;display:flex;flex-direction:column;gap:.55rem}
+.svc .row{display:grid;grid-template-columns:5.5rem minmax(0,1fr) 3rem;gap:.7rem;align-items:center}
+.svc dt{font-family:var(--display);font-size:.72rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--faint)}
+.svc dd{margin:0;font-family:var(--mono);font-size:.85rem;color:var(--text);
+  text-align:right;font-variant-numeric:tabular-nums}
+.meter{height:.45rem;border-radius:99px;background:var(--night);overflow:hidden;
+  box-shadow:inset 0 0 0 1px var(--edge)}
+.meter i{display:block;height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--ember),var(--kiln))}
+.meter[data-hot="yes"] i{background:linear-gradient(90deg,var(--brick),var(--ember))}
+.svc .plain{font-family:var(--mono);font-size:.85rem;color:var(--dim)}
+.stamp{margin-top:1.25rem;color:var(--faint);font-size:.88rem;font-family:var(--mono)}
+
 /* Conduct -------------------------------------------------------------- */
 .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(15.5rem,1fr));gap:1rem;list-style:none;margin:0;padding:0}
 .rule{
@@ -301,9 +346,11 @@ footer .legal{max-width:40ch;line-height:1.5}
     <nav>
       <a href="#server">Server</a>
       <a href="#features">Features</a>
+      <a href="#updates">Updates</a>
+      <a href="#status">Status</a>
       <a href="#rules">Rules</a>
-      <a href="#staff">Staff</a>
     </nav>
+    <a class="btn btn-cool" href="https://brickworks.tebex.io/" rel="noopener">Store</a>
     <a class="btn btn-hot" href="https://discord.brickworks.world" rel="noopener">Discord</a>
   </div>
 </header>
@@ -341,8 +388,8 @@ footer .legal{max-width:40ch;line-height:1.5}
   <div class="wrap">
     <div class="stat"><b class="hot" id="n-online">—</b><span>Players online</span></div>
     <div class="stat"><b>20</b><span>Hearts, if you earn them</span></div>
-    <div class="stat"><b>100</b><span>Slots</span></div>
-    <div class="stat"><b>26.1.2</b><span>Java Edition</span></div>
+    <div class="stat"><b>Any</b><span>Version you can join on</span></div>
+    <div class="stat"><b>1</b><span>Server we run</span></div>
   </div>
 </div>
 
@@ -373,8 +420,8 @@ footer .legal{max-width:40ch;line-height:1.5}
         <div class="tags">
           <span class="tag"><b>IP</b> play.brickworks.world</span>
           <span class="tag"><b>Edition</b> Java</span>
-          <span class="tag"><b>Version</b> 26.1.2</span>
-          <span class="tag"><b>Older clients</b> ViaVersion</span>
+          <span class="tag"><b>Running</b> 26.1.2</span>
+          <span class="tag"><b>Join on</b> any version</span>
         </div>
       </div>
       <div class="show-art"><canvas id="plot" aria-label="An isometric build plot made of blocks"></canvas></div>
@@ -408,7 +455,7 @@ footer .legal{max-width:40ch;line-height:1.5}
       <li class="tile" style="--c:#8B5CF6">
         <svg viewBox="0 0 32 32" aria-hidden="true"><path class="cube-t" d="M16 2 30 10 16 18 2 10Z"/><path class="cube-l" d="M2 10v12l14 8V18Z"/><path class="cube-r" d="M30 10v12l-14 8V18Z"/></svg>
         <h3>Gems</h3>
-        <p>You earn gems just for playing, and they buy crate keys and ranks in <code>/gemshop</code>. Nobody has to spend real money to get them.</p>
+        <p>Earned just for playing, and spent in <code>/gemshop</code> on crate keys and ranks. Buying them is optional, playing gets you there too.</p>
       </li>
       <li class="tile" style="--c:#FFC857">
         <svg viewBox="0 0 32 32" aria-hidden="true"><path class="cube-t" d="M16 2 30 10 16 18 2 10Z"/><path class="cube-l" d="M2 10v12l14 8V18Z"/><path class="cube-r" d="M30 10v12l-14 8V18Z"/></svg>
@@ -454,6 +501,33 @@ footer .legal{max-width:40ch;line-height:1.5}
   </div>
 </section>
 
+<section id="updates">
+  <div class="wrap">
+    <div class="head">
+      <p class="kicker">Updates</p>
+      <h2>What we've changed</h2>
+      <p class="sub">Bigger announcements and wipe warnings go in Discord first.</p>
+    </div>
+    <ul class="log" id="log">
+      <li class="entry"><time>&nbsp;</time><h3>Loading updates…</h3></li>
+    </ul>
+  </div>
+</section>
+
+<section id="status">
+  <div class="wrap">
+    <div class="head">
+      <p class="kicker">Status</p>
+      <h2>Is it up?</h2>
+      <p class="sub">Checked on the box itself, once a minute.</p>
+    </div>
+    <ul class="svcs" id="svcs">
+      <li class="svc"><div class="svc-top"><span class="svc-name">Checking…</span></div></li>
+    </ul>
+    <p class="stamp" id="stamp"></p>
+  </div>
+</section>
+
 <section id="rules">
   <div class="wrap">
     <div class="head">
@@ -481,6 +555,7 @@ footer .legal{max-width:40ch;line-height:1.5}
         <button type="button" id="copy2" aria-label="Copy server address">Copy IP</button>
       </div>
       <a class="btn btn-cool" href="https://discord.brickworks.world" rel="noopener">Join Discord</a>
+      <a class="btn btn-cool" href="https://brickworks.tebex.io/" rel="noopener">Store</a>
     </div>
   </div>
 </section>
@@ -502,6 +577,11 @@ footer .legal{max-width:40ch;line-height:1.5}
         <a href="https://discord.brickworks.world" rel="noopener">discord.brickworks.world</a>
         <p>Support, announcements, and where we post about wipes before they happen. Worth being in for that alone.</p>
       </div>
+      <div class="card">
+        <p class="kicker">Store</p>
+        <a href="https://brickworks.tebex.io/" rel="noopener">brickworks.tebex.io</a>
+        <p>Gems, and nothing else. You spend them in <code>/gemshop</code> on keys and ranks, and you can earn them just by playing, so buying is a shortcut rather than a wall.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -511,7 +591,9 @@ footer .legal{max-width:40ch;line-height:1.5}
     <span>© <span id="year">2026</span> BrickWorks Network</span>
     <nav>
       <a href="#server">Server</a><a href="#features">Features</a>
+      <a href="#updates">Updates</a><a href="#status">Status</a>
       <a href="#rules">Rules</a><a href="mailto:staff@brickworks.world">Contact</a>
+      <a href="https://brickworks.tebex.io/" rel="noopener">Store</a>
       <a href="https://discord.brickworks.world" rel="noopener">Discord</a>
     </nav>
     <span class="legal">Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</span>
@@ -557,6 +639,71 @@ for (const id of ['', '2']) {
   } catch {
     // ponytail: no retry — if the status API is unreachable the pill just names the server.
     text.textContent = 'play.brickworks.world';
+  }
+})();
+
+/* Updates, newest first, from updates.json ------------------------------- */
+(async () => {
+  const log = document.getElementById('log');
+  const fmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  try {
+    const items = await (await fetch('updates.json', { cache: 'no-cache' })).json();
+    items.sort((a, b) => (a.date < b.date ? 1 : -1));
+    log.replaceChildren(...items.map(u => {
+      const li = document.createElement('li');
+      li.className = 'entry';
+      const t = document.createElement('time');
+      t.dateTime = u.date;
+      t.textContent = fmt.format(new Date(u.date + 'T00:00:00Z'));
+      const h = document.createElement('h3');
+      h.textContent = u.title;
+      const p = document.createElement('p');
+      p.textContent = u.body;
+      li.append(t, h, p);
+      return li;
+    }));
+  } catch {
+    log.innerHTML = '<li class="entry"><time>&nbsp;</time><h3>No updates to show right now.</h3></li>';
+  }
+})();
+
+/* Status, from the JSON the box writes every minute ----------------------- */
+(async () => {
+  const list = document.getElementById('svcs');
+  const stamp = document.getElementById('stamp');
+
+  const meter = (label, pct) => `
+    <div class="row">
+      <dt>${label}</dt>
+      <div class="meter" data-hot="${pct >= 85 ? 'yes' : 'no'}"><i style="width:${Math.min(pct, 100)}%"></i></div>
+      <dd>${pct}%</dd>
+    </div>`;
+
+  try {
+    const d = await (await fetch('status.json', { cache: 'no-cache' })).json();
+    list.replaceChildren(...d.services.map(s => {
+      const li = document.createElement('li');
+      li.className = 'svc';
+      li.dataset.up = s.up ? 'yes' : 'no';
+      let body = '';
+      if (s.id === 'host' && s.up) {
+        body = `<dl>${meter('CPU', s.cpu)}${meter('Memory', s.memory)}${meter('Disk', s.disk)}
+          <div class="row"><dt>Uptime</dt><div></div><dd>${s.uptime_days}d</dd></div></dl>`;
+      } else if (s.up && typeof s.players === 'number') {
+        body = `<p class="plain">${s.players}${s.max ? ' / ' + s.max : ''} online</p>`;
+      } else if (!s.up) {
+        body = '<p class="plain">Not responding</p>';
+      }
+      li.innerHTML = `<div class="svc-top"><span class="svc-name">${s.name}</span>
+        <span class="dot-s">${s.up ? 'Up' : 'Down'}</span></div>${body}`;
+      return li;
+    }));
+    stamp.textContent = 'Last checked ' + new Date(d.generated).toLocaleString('en-GB');
+  } catch {
+    // Only the box writes status.json, so mirrors of this page have none.
+    list.innerHTML = '<li class="svc"><div class="svc-top"><span class="svc-name">Status unavailable</span></div>' +
+      '<p class="plain">Live status is on brickworks.world.</p></li>';
+    stamp.textContent = '';
   }
 })();
 

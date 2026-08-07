@@ -24,10 +24,43 @@ Open `index.html` and edit it. That's the workflow.
 - **Live player count and player heads** come from `api.mcstatus.io` and
   degrade to the plain server address if that request fails.
 
+## Updates
+
+`updates.json` drives the Updates section. Newest first is handled for you, so
+just add an object and push:
+
+```json
+{ "date": "2026-08-09", "title": "Short headline", "body": "A sentence or two." }
+```
+
+## Status
+
+`tools/status.py` runs **on the box**, pings the proxy, the limbo and BrickSMP,
+reads the host's own CPU/memory/disk, and writes `status.json` into the web
+root. A systemd timer runs it every minute.
+
+It deliberately runs server-side rather than from the visitor's browser: the
+servers only listen on the box's own address, and BrickSMP is an external server
+on a lobby network whose rules forbid advertising a direct join address. Nothing
+in the JSON names a host or a port.
+
+The proxy check sends a **PROXY protocol v1 header** first. Velocity has
+`haproxy-protocol = true`, so a plain connection is dropped with no response and
+the proxy would always look down.
+
+Anywhere `status.json` is missing (the GitHub Pages mirror, a local checkout)
+the section says so instead of breaking.
+
 ## Deploying
 
-GitHub Pages serves `main` from the repository root. Pushing to `main` is the
-deploy.
+Two places serve this:
+
+- **brickworks.world** — the real one. nginx serves `/var/www/brickworks`. The
+  apex vhost lives in `/etc/nginx/conf.d/matrix.conf` and also answers
+  `/.well-known/matrix/*` for the Matrix homeserver; those are exact-match
+  locations so they outrank the site's `location /`. Don't remove them.
+- **GitHub Pages** — a mirror at `brick-bread.github.io/brickworks-site`.
+  Pushing to `main` deploys it. No live status there.
 
 ## Note
 
