@@ -11,12 +11,30 @@ NIGHT, EMBER, BRICK, KILN, WHITE, DIM = (
     (10, 11, 20), (255, 106, 61), (194, 80, 58), (255, 200, 87),
     (255, 255, 255), (154, 160, 192))
 
-# PIL can't open woff2, so the shipped webfont is decompressed to a temp OTF
+# PIL can't open woff2 or pick a weight off a variable font, so the shipped
+# webfont is decompressed and pinned to one weight per size we need.
 from fontTools.ttLib import TTFont  # noqa: E402
-_otf = os.path.join(tempfile.gettempdir(), "bw-display.otf")
-TTFont("fonts/bw-display.woff2").save(_otf)
-DISPLAY = _otf
+from fontTools.varLib import instancer  # noqa: E402
+
 MONO = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf"
+# The page renders this face at size-adjust:105%; match it here.
+ADJUST = 1.05
+
+
+def display(px, weight):
+    """One static instance of the webfont, at the page's adjusted size."""
+    path = os.path.join(tempfile.gettempdir(), f"bw-display-{weight}.ttf")
+    if not os.path.exists(path):
+        f = TTFont("fonts/bw-display.woff2")
+        instancer.instantiateVariableFont(f, {"wght": weight}, inplace=True)
+        f.save(path)
+    return ImageFont.truetype(path, round(px * ADJUST))
+
+
+def cap_top(font, y):
+    """PIL draws from the ascender and this face has a very tall one, so
+    headline positions are given as the top of the capitals instead."""
+    return y - font.getbbox("H")[1]
 
 img = Image.new("RGB", (W, H), NIGHT)
 d = ImageDraw.Draw(img)
@@ -62,14 +80,14 @@ def heart(draw, x, y, cell, filled):
                            fill=main if ch == "#" else shade)
 
 
-kicker = ImageFont.truetype(DISPLAY, 30)
-head = ImageFont.truetype(DISPLAY, 104)
+kicker = display(30, 500)
+head = display(104, 700)
 mono = ImageFont.truetype(MONO, 30)
 
 PAD = 80
-tracked(d, (PAD, 74), "BRICKWORKS NETWORK", kicker, KILN, track=9)
-d.text((PAD, 140), "KILL SOMEONE.", font=head, fill=WHITE)
-d.text((PAD, 244), "TAKE THEIR HEART.", font=head, fill=EMBER)
+tracked(d, (PAD, cap_top(kicker, 74)), "BRICKWORKS NETWORK", kicker, KILN, track=9)
+d.text((PAD, cap_top(head, 140)), "KILL SOMEONE.", font=head, fill=WHITE)
+d.text((PAD, cap_top(head, 253)), "TAKE THEIR HEART.", font=head, fill=EMBER)
 
 # ten hearts, six of them yours: the lifesteal ledger in one row
 cell = 4

@@ -21,6 +21,23 @@ Open `index.html` and edit it. That's the workflow.
 - **The heart ledger** in the hero is the page's one signature element: twenty
   slots, ten filled, and a single scripted pass on load showing a kill adding a
   heart and a death taking it back. It sits still under `prefers-reduced-motion`.
+- **The display face** is Oswald, subset to Latin-1 with its weight axis kept
+  between 500 and 700, so headings can be heavy and nav labels calm from one
+  21 KB file. `size-adjust:105%` in the `@font-face` block puts its caps back
+  on the widths the layout was built against — change it and every display size
+  on the page shifts. Rebuild it from the upstream variable font by clipping
+  the axis first, then subsetting:
+  ```
+  python3 -c "from fontTools.ttLib import TTFont; from fontTools.varLib import \
+    instancer; f = TTFont('Oswald[wght].ttf'); \
+    instancer.instantiateVariableFont(f, {'wght': (500, 600, 700)}, inplace=True); \
+    f.save('oswald-500-700.ttf')"
+  python3 -m fontTools.subset oswald-500-700.ttf \
+    --unicodes='U+0020-007E,U+00A0-00FF,U+2013-2014,U+2018-201D,U+2022,U+2026,U+00B7,U+00D7,U+2190,U+2192' \
+    --layout-features='kern,liga,ccmp,mark,mkmk,locl' \
+    --flavor=woff2 --output-file=fonts/bw-display.woff2
+  ```
+  Re-run `python3 tools/og.py` after any font change; the card uses the same file.
 - **The pixel icons** (hearts, feature tiles, `og.png`) all come from one set of
   16x16 masks in `tools/icons.py`, which prints an SVG sprite. Edit a mask as
   ASCII art, re-run it, and paste the sprite back into `index.html`.
