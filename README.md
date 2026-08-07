@@ -118,6 +118,8 @@ Two places serve this:
   apex vhost lives in `/etc/nginx/conf.d/matrix.conf` and also answers
   `/.well-known/matrix/*` for the Matrix homeserver; those are exact-match
   locations so they outrank the site's `location /`. Don't remove them.
+  For the death-screen 404 page, the vhost needs `error_page 404 /404.html;`
+  (GitHub Pages picks `404.html` up automatically).
 - **GitHub Pages** — a mirror at `brick-bread.github.io/brickworks-site`.
   Pushing to `main` deploys it. No live status there. Asset paths are relative so
   the subpath works; only the `og:image` is absolute, and it deliberately points

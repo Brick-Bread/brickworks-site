@@ -4,7 +4,42 @@ const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 $('year').textContent = new Date().getFullYear();
 
+/* Scroll progress into the XP bar --------------------------------------- */
+(() => {
+  const fill = $('xp-fill');
+  let raf = null;
+  const set = () => {
+    raf = null;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    fill.style.width = (max > 0 ? Math.min(100, scrollY / max * 100) : 0) + '%';
+  };
+  addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(set); }, { passive: true });
+  set();
+})();
+
+/* Highlight the section the reader is in -------------------------------- */
+(() => {
+  const links = new Map();
+  for (const a of document.querySelectorAll('.top nav a'))
+    links.set(a.getAttribute('href').slice(1), a);
+  let active = null;
+  const obs = new IntersectionObserver(entries => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      if (active) delete active.dataset.active;
+      active = links.get(e.target.id);
+      if (active) active.dataset.active = '';
+    }
+  }, { rootMargin: '-30% 0px -60%' });
+  for (const id of links.keys()) {
+    const el = document.getElementById(id);
+    if (el) obs.observe(el);
+  }
+})();
+
 /* Copy the address ------------------------------------------------------ */
+const toast = $('toast');
+let toastTimer = null;
 for (const id of ['', '2']) {
   const btn = $('copy' + id);
   btn.addEventListener('click', async () => {
@@ -15,6 +50,9 @@ for (const id of ['', '2']) {
       document.execCommand('copy'); t.remove(); }
     btn.textContent = 'Copied!'; btn.dataset.done = '';
     setTimeout(() => { btn.textContent = 'Copy IP'; delete btn.dataset.done; }, 1800);
+    toast.dataset.show = '';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => delete toast.dataset.show, 3200);
   });
 }
 
@@ -115,6 +153,9 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     rowNote.textContent = n === 1
       ? 'How it looks in your server list. 1 player on right now.'
       : `How it looks in your server list. ${n} players on right now.`;
+    $('join-live').textContent = n === 0
+      ? " Nobody's on right now, so you get first pick of the map."
+      : (n === 1 ? ' One player is on right now.' : ` ${n} players are on right now.`);
     const heads = $('heads');
     for (const p of (d.players?.list ?? []).slice(0, 6)) {
       const img = new Image();
@@ -184,6 +225,20 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     btn.addEventListener('click', () => show(btn));
   }
   if (slots.length) show(slots[0]);
+
+  /* Arrow keys walk the grid the way they walk a chest. */
+  const chest = document.querySelector('.chest');
+  chest.addEventListener('keydown', e => {
+    const i = [...slots].indexOf(document.activeElement);
+    if (i < 0) return;
+    const cols = getComputedStyle(chest).gridTemplateColumns.split(' ').length;
+    const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: cols, ArrowUp: -cols }[e.key];
+    if (!step) return;
+    const j = i + step;
+    if (j < 0 || j >= slots.length) return;
+    e.preventDefault();
+    slots[j].focus();
+  });
 })();
 
 /* Updates, newest first, from updates.json ------------------------------- */
@@ -308,6 +363,7 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     ctx.globalAlpha = 1;
   }
 
+  let raf = null;
   function frame() {
     for (let i = 0; i < sparks.length; i++) {
       const p = sparks[i];
@@ -315,10 +371,16 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
       if (p.y < -4) sparks[i] = spawn(false);
     }
     paint();
-    requestAnimationFrame(frame);
+    raf = requestAnimationFrame(frame);
   }
 
   size();
-  addEventListener('resize', () => { size(); if (still) paint(); });
-  if (still) paint(); else frame();
+  addEventListener('resize', () => { size(); paint(); });
+  if (still) { paint(); return; }
+
+  /* Only burn frames while the hero is on screen. */
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !raf) frame();
+    else if (!e.isIntersecting && raf) { cancelAnimationFrame(raf); raf = null; }
+  }).observe(cv);
 })();

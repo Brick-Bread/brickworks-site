@@ -28,6 +28,9 @@
 
 <a class="skip" href="#main">Skip to content</a>
 
+<!-- Scroll progress, drawn as the game's XP bar. -->
+<div class="xp" aria-hidden="true"><b id="xp-fill"></b></div>
+
 <header class="top">
   <div class="wrap">
     <a class="brand" href="./">
@@ -129,12 +132,12 @@
     </div>
     <ul class="econ">
       <li class="eco">
-        <span class="eco-sign gain">+1</span>
+        <span class="eco-sign gain">+1 <svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-heart"/></svg></span>
         <h3>Land a kill</h3>
         <p>One of their hearts moves to you, permanently. The cap is twenty &mdash; two full rows.</p>
       </li>
       <li class="eco">
-        <span class="eco-sign loss">&minus;1</span>
+        <span class="eco-sign loss">&minus;1 <svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-heart"/></svg></span>
         <h3>Die</h3>
         <p>To a player, to lava, to gravity &mdash; doesn't matter. The floor is one heart. You never hit zero; you just lose everything else.</p>
       </li>
@@ -296,7 +299,7 @@
   <div class="wrap">
     <p class="kicker">/play</p>
     <h2 id="join-h">Your first ten hearts<br>are already waiting</h2>
-    <p class="sub">Copy the address, paste it into Minecraft, pick a spot.</p>
+    <p class="sub">Copy the address, paste it into Minecraft, pick a spot.<span id="join-live"></span></p>
     <div class="cta">
       <div class="ip">
         <code id="ip2">play.brickworks.world</code>
@@ -326,6 +329,13 @@
 </section>
 
 </main>
+
+<!-- Advancement toast, shown when the address is copied. Decorative echo of
+     the buttons' own "Copied!" state. -->
+<div class="toast" id="toast" aria-hidden="true">
+  <svg viewBox="0 0 16 16"><use href="#i-heart"/></svg>
+  <div><b>Achievement get!</b><span>Server address copied</span></div>
+</div>
 
 <footer>
   <div class="wrap">
