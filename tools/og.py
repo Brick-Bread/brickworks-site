@@ -7,9 +7,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from icons import G, rows  # noqa: E402
 
 W, H = 1200, 630
-NIGHT, EMBER, BRICK, KILN, WHITE, DIM = (
-    (10, 11, 20), (255, 106, 61), (194, 80, 58), (255, 200, 87),
-    (255, 255, 255), (154, 160, 192))
+VOID, HEART, BLOOD, EMBER, KILN, BONE, ASH = (
+    (13, 8, 13), (255, 77, 87), (196, 43, 68), (255, 106, 61),
+    (255, 200, 87), (244, 236, 226), (185, 169, 190))
+SLAB, SEAM = (32, 22, 38), (58, 42, 68)
 
 # PIL can't open woff2 or pick a weight off a variable font, so the shipped
 # webfont is decompressed and pinned to one weight per size we need.
@@ -17,60 +18,68 @@ from fontTools.ttLib import TTFont  # noqa: E402
 from fontTools.varLib import instancer  # noqa: E402
 
 MONO = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf"
-# The page renders this face at size-adjust:105%; match it here.
-ADJUST = 1.05
 
 
 def display(px, weight):
-    """One static instance of the webfont, at the page's adjusted size."""
+    """One static instance of the webfont."""
     path = os.path.join(tempfile.gettempdir(), f"bw-display-{weight}.ttf")
     if not os.path.exists(path):
         f = TTFont("fonts/bw-display.woff2")
         instancer.instantiateVariableFont(f, {"wght": weight}, inplace=True)
         f.save(path)
-    return ImageFont.truetype(path, round(px * ADJUST))
+    return ImageFont.truetype(path, px)
 
 
 def cap_top(font, y):
-    """PIL draws from the ascender and this face has a very tall one, so
-    headline positions are given as the top of the capitals instead."""
+    """PIL draws from the ascender; headline positions are given as the top
+    of the capitals instead."""
     return y - font.getbbox("H")[1]
 
-img = Image.new("RGB", (W, H), NIGHT)
+
+img = Image.new("RGB", (W, H), VOID)
 d = ImageDraw.Draw(img)
 
-# warm horizon glow, painted as horizontal bands from the bottom up
+# ember horizon glow, painted as horizontal bands from the bottom up
 for y in range(H):
     t = max(0.0, (y - H * 0.45) / (H * 0.55)) ** 2
     if t:
         d.line([(0, y), (W, y)], fill=(
-            int(NIGHT[0] + (60 - NIGHT[0]) * t * 0.55),
-            int(NIGHT[1] + (26 - NIGHT[1]) * t * 0.55),
-            int(NIGHT[2] + (30 - NIGHT[2]) * t * 0.55)))
+            int(VOID[0] + (72 - VOID[0]) * t * 0.55),
+            int(VOID[1] + (24 - VOID[1]) * t * 0.55),
+            int(VOID[2] + (22 - VOID[2]) * t * 0.55)))
 
 random.seed(7)
-for _ in range(220):
+for _ in range(200):
     x, y = random.random() * W, random.random() * H * 0.6
     v = random.random()
-    c = KILN if v > 0.85 else (232, 234, 245)
-    a = 0.15 + random.random() * 0.5
+    c = KILN if v > 0.85 else BONE
+    a = 0.12 + random.random() * 0.45
     s = 3 if v > 0.93 else 2
     d.rectangle([x, y, x + s, y + s],
-                fill=tuple(int(NIGHT[i] + (c[i] - NIGHT[i]) * a) for i in range(3)))
+                fill=tuple(int(VOID[i] + (c[i] - VOID[i]) * a) for i in range(3)))
 
 
-def tracked(draw, xy, text, font, fill, track=0):
+def headline(xy, text, font, fill):
+    """The site's hard one-step text shadow, then the text."""
     x, y = xy
-    for ch in text:
-        draw.text((x, y), ch, font=font, fill=fill)
-        x += draw.textlength(ch, font=font) + track
-    return x
+    d.text((x + 5, y + 6), text, font=font, fill=(0, 0, 0))
+    d.text((x, y), text, font=font, fill=fill)
+
+
+def fit(text, weight, px, max_w):
+    """Largest instance of the face, at most px, that keeps text inside max_w."""
+    while px > 40:
+        font = display(px, weight)
+        if d.textlength(text, font=font) <= max_w:
+            return font
+        px -= 2
+    return display(px, weight)
 
 
 def heart(draw, x, y, cell, filled):
     """The same 16x16 mask the site's icons use, drawn as flat pixels."""
-    main = EMBER if filled else (28, 32, 51)
-    shade = BRICK if filled else (20, 23, 38)
+    main = HEART if filled else (36, 26, 41)
+    shade = BLOOD if filled else (26, 18, 32)
     for gy, line in enumerate(rows(G["heart"])):
         for gx, ch in enumerate(line):
             if ch == ".":
@@ -80,14 +89,16 @@ def heart(draw, x, y, cell, filled):
                            fill=main if ch == "#" else shade)
 
 
-kicker = display(30, 500)
-head = display(104, 700)
-mono = ImageFont.truetype(MONO, 30)
-
 PAD = 80
-tracked(d, (PAD, cap_top(kicker, 74)), "BRICKWORKS NETWORK", kicker, KILN, track=9)
-d.text((PAD, cap_top(head, 140)), "KILL SOMEONE.", font=head, fill=WHITE)
-d.text((PAD, cap_top(head, 253)), "TAKE THEIR HEART.", font=head, fill=EMBER)
+mono = ImageFont.truetype(MONO, 30)
+kicker = ImageFont.truetype(MONO, 28)
+
+d.text((PAD, 52), "> brickworks.world", font=kicker, fill=KILN)
+
+# sentence case, weight 800: the site's headline verbatim
+head = fit("Take their heart.", 800, 108, W - 2 * PAD)
+headline((PAD, cap_top(head, 136)), "Kill someone.", head, BONE)
+headline((PAD, cap_top(head, 256)), "Take their heart.", head, HEART)
 
 # ten hearts, six of them yours: the lifesteal ledger in one row
 cell = 4
@@ -96,12 +107,12 @@ for i in range(10):
     heart(d, PAD + i * (hw + 18), 400, cell, i < 6)
 
 d.text((PAD, 500), "Java lifesteal  ·  no claims  ·  griefing allowed",
-       font=mono, fill=DIM)
+       font=mono, fill=ASH)
 
 chip = [PAD, 548, PAD + int(d.textlength("play.brickworks.world", font=mono)) + 44, 610]
-d.rectangle(chip, fill=(22, 26, 43))
-d.rectangle(chip, outline=(39, 45, 69), width=2)
-d.text((PAD + 22, 562), "play.brickworks.world", font=mono, fill=WHITE)
+d.rectangle(chip, fill=SLAB)
+d.rectangle(chip, outline=SEAM, width=2)
+d.text((PAD + 22, 562), "play.brickworks.world", font=mono, fill=BONE)
 
 img.save("og.png", optimize=True)
 print("wrote og.png", img.size)
