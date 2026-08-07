@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>BrickWorks Network — Home of BrickSMP</title>
-<meta name="description" content="BrickWorks runs one Minecraft server, BrickSMP. Java survival with a shop, an auction house and full block logging. play.brickworks.world">
+<title>BrickWorks Network — BrickSMP Lifesteal</title>
+<meta name="description" content="BrickSMP is a Java lifesteal server. Take a heart for every kill, lose one for every death, no claims and no protected land. play.brickworks.world">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0A0B14">
-<meta property="og:title" content="BrickWorks Network — Home of BrickSMP">
-<meta property="og:description" content="We run one server and it's called BrickSMP. Java survival at play.brickworks.world.">
+<meta property="og:title" content="BrickSMP — Java lifesteal on the BrickWorks Network">
+<meta property="og:description" content="Kill someone, take their heart. No claims, no protected land. play.brickworks.world">
 <meta property="og:type" content="website">
 
 <style>
@@ -204,6 +204,7 @@ section{padding-block:clamp(3rem,4.6vw,4.5rem)}
 .show-copy{display:flex;flex-direction:column;gap:1.25rem;min-width:0}
 .show-copy p{color:var(--dim)}
 .show-copy p b{color:var(--white);font-weight:600}
+.show-copy code,.tile code{font-family:var(--mono);font-size:.92em;color:var(--kiln)}
 .tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.35rem}
 .tag{
   font-family:var(--mono);font-size:.82rem;padding:.4rem .8rem;border-radius:3px;
@@ -315,10 +316,11 @@ footer .legal{max-width:40ch;line-height:1.5}
         <span class="pill off" id="pill"><span class="pulse"></span><span id="pill-text">Checking…</span></span>
         <div class="heads" id="heads"></div>
       </div>
-      <h1>We run one server.<br><span class="grad">It's BrickSMP.</span></h1>
+      <h1>Kill someone.<br><span class="grad">Take their heart.</span></h1>
       <p class="sell">
-        Java survival with an economy that works, an auction house, and staff who
-        log on. We'd rather run one server properly than ten badly.
+        BrickSMP is lifesteal. Every kill gives you one of their hearts, every death
+        costs you one of yours. No claims, no protected land. We run this one server
+        and nothing else.
       </p>
       <div class="cta">
         <div class="ip">
@@ -338,8 +340,8 @@ footer .legal{max-width:40ch;line-height:1.5}
 <div class="band">
   <div class="wrap">
     <div class="stat"><b class="hot" id="n-online">—</b><span>Players online</span></div>
+    <div class="stat"><b>20</b><span>Hearts, if you earn them</span></div>
     <div class="stat"><b>100</b><span>Slots</span></div>
-    <div class="stat"><b>1</b><span>Server we run</span></div>
     <div class="stat"><b>26.1.2</b><span>Java Edition</span></div>
   </div>
 </div>
@@ -353,17 +355,20 @@ footer .legal{max-width:40ch;line-height:1.5}
     <div class="show">
       <div class="show-copy">
         <p>
-          Survival, the normal way. Build where you want, sell what you don't need,
-          and get on with it.
+          You start on 10 hearts. Kill a player and you take one of theirs, up to 20.
+          Die to one and you lose one, down to a floor of 1. You can pull hearts out of
+          yourself with <code>/withdraw</code> and carry them as items, which also means
+          you can trade them, gamble them, or drop the lot when someone catches you.
         </p>
         <p>
-          <b>The world does get wiped sometimes.</b> There's no schedule for it and we're
-          not going to pretend there is. When one is coming we say so in Discord first,
-          with enough warning to get your stuff out.
+          <b>There are no claims and griefing is allowed.</b> If you can get into it, you
+          can have it. Hide your base or build something you can defend. Staff don't roll
+          back raids, that's the game.
         </p>
         <p>
-          We log every block placed and every chest opened. If someone wrecks your base,
-          tell staff and we'll put it back the way it was.
+          <b>Everything gets wiped eventually.</b> Not just the world, all of it. There's
+          no schedule and there's no getting your stuff out first, so don't get too
+          attached to a base. We post in Discord before it happens.
         </p>
         <div class="tags">
           <span class="tag"><b>IP</b> play.brickworks.world</span>
@@ -382,9 +387,29 @@ footer .legal{max-width:40ch;line-height:1.5}
     <div class="head">
       <p class="kicker">Features</p>
       <h2>What's on it</h2>
-      <p class="sub">The stuff you'll actually use once you've got a base up.</p>
+      <p class="sub">The stuff you'll actually use once you're in.</p>
     </div>
     <ul class="tiles">
+      <li class="tile" style="--c:#D9533B">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path class="cube-t" d="M16 2 30 10 16 18 2 10Z"/><path class="cube-l" d="M2 10v12l14 8V18Z"/><path class="cube-r" d="M30 10v12l-14 8V18Z"/></svg>
+        <h3>Hearts</h3>
+        <p><code>/withdraw</code> pulls hearts out of yourself as items. Carry them, trade them, or hand them over when someone has you cornered.</p>
+      </li>
+      <li class="tile" style="--c:#FF6A3D">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path class="cube-t" d="M16 2 30 10 16 18 2 10Z"/><path class="cube-l" d="M2 10v12l14 8V18Z"/><path class="cube-r" d="M30 10v12l-14 8V18Z"/></svg>
+        <h3>Bounties</h3>
+        <p>Put your own money on someone's head and let the server come after them. <code>/bounties</code> to set one or see who's worth hunting.</p>
+      </li>
+      <li class="tile" style="--c:#4FD6E0">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path class="cube-t" d="M16 2 30 10 16 18 2 10Z"/><path class="cube-l" d="M2 10v12l14 8V18Z"/><path class="cube-r" d="M30 10v12l-14 8V18Z"/></svg>
+        <h3>Teams</h3>
+        <p>Run with people instead of getting jumped by them. <code>/team</code> to make one or get invited into one.</p>
+      </li>
+      <li class="tile" style="--c:#8B5CF6">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path class="cube-t" d="M16 2 30 10 16 18 2 10Z"/><path class="cube-l" d="M2 10v12l14 8V18Z"/><path class="cube-r" d="M30 10v12l-14 8V18Z"/></svg>
+        <h3>Gems</h3>
+        <p>You earn gems just for playing, and they buy crate keys and ranks in <code>/gemshop</code>. Nobody has to spend real money to get them.</p>
+      </li>
       <li class="tile" style="--c:#FFC857">
         <svg viewBox="0 0 32 32" aria-hidden="true"><path class="cube-t" d="M16 2 30 10 16 18 2 10Z"/><path class="cube-l" d="M2 10v12l14 8V18Z"/><path class="cube-r" d="M30 10v12l-14 8V18Z"/></svg>
         <h3>The shop</h3>
@@ -417,13 +442,13 @@ footer .legal{max-width:40ch;line-height:1.5}
       </li>
       <li class="tile" style="--c:#D9533B">
         <svg viewBox="0 0 32 32" aria-hidden="true"><path class="cube-t" d="M16 2 30 10 16 18 2 10Z"/><path class="cube-l" d="M2 10v12l14 8V18Z"/><path class="cube-r" d="M30 10v12l-14 8V18Z"/></svg>
-        <h3>Block logging</h3>
-        <p>We can see who placed or broke anything, and when. That's how griefing gets undone instead of argued about.</p>
+        <h3>Homes and warps</h3>
+        <p><code>/sethome</code> so you've got somewhere to run back to, and public warps for the places worth knowing about.</p>
       </li>
       <li class="tile" style="--c:#B9C2E8">
         <svg viewBox="0 0 32 32" aria-hidden="true"><path class="cube-t" d="M16 2 30 10 16 18 2 10Z"/><path class="cube-l" d="M2 10v12l14 8V18Z"/><path class="cube-r" d="M30 10v12l-14 8V18Z"/></svg>
         <h3>Anticheat</h3>
-        <p>Runs on the server, not your client. It catches cheaters without punishing you for having bad ping.</p>
+        <p>Runs on the server, not your client. It catches killaura and reach without punishing you for having bad ping.</p>
       </li>
     </ul>
   </div>
@@ -437,7 +462,7 @@ footer .legal{max-width:40ch;line-height:1.5}
     </div>
     <ul class="rules">
       <li class="rule"><b>No cheating</b><p>No cheat clients, no macros, nothing playing the game for you. Bots get you banned across the whole network, not warned.</p></li>
-      <li class="rule"><b>No scamming</b><p>Scams, phishing links and account trading all end the same way.</p></li>
+      <li class="rule"><b>Nothing outside the game</b><p>Phishing links, account selling and real-money scams. Raid people all you like, but keep it in Minecraft.</p></li>
       <li class="rule"><b>13 and over</b><p>You have to be 13 to play here. Anything involving minors gets reported, not moderated.</p></li>
       <li class="rule"><b>Don't stack alts</b><p>There's a cap on how many accounts you can run, and evading a ban doesn't reset anything.</p></li>
     </ul>
