@@ -74,24 +74,10 @@ def ping(port, proxy_protocol=False):
 
 
 def host_stats():
-    with open("/proc/loadavg") as f:
-        load1 = float(f.read().split()[0])
-    mem = {}
-    with open("/proc/meminfo") as f:
-        for line in f:
-            k, v = line.split(":", 1)
-            mem[k] = int(v.split()[0])
     with open("/proc/uptime") as f:
         uptime = float(f.read().split()[0])
-    st = os.statvfs("/")
-    used = (st.f_blocks - st.f_bfree) / st.f_blocks * 100
-
-    total, avail = mem["MemTotal"], mem.get("MemAvailable", mem["MemFree"])
     return {
         "id": "host", "name": "Main box", "up": True,
-        "cpu": round(min(load1 / (os.cpu_count() or 1) * 100, 100), 1),
-        "memory": round((total - avail) / total * 100, 1),
-        "disk": round(used, 1),
         "uptime_days": int(uptime // 86400),
     }
 
