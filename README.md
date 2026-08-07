@@ -2,9 +2,10 @@
 
 Website for the **BrickWorks Network** — home of BrickSMP.
 
-`index.html` is the whole site: one self-contained file, no build step, no
-dependencies, no external requests. The display face is inlined as a data URI
-and the hero wall is drawn on a canvas, so the page renders identically offline.
+`index.html` is the site: hand-written HTML with the CSS and JS inline, no build
+step and no dependencies. Two files sit beside it — `fonts/bw-display.woff2`
+(the display face, subset to the glyphs the page uses) and `og.png` (the link
+preview). Nothing else is fetched except the live player count.
 
 ## Editing
 
@@ -17,10 +18,15 @@ Open `index.html` and edit it. That's the workflow.
   theme. Every colour is painted explicitly, so there is no light variant to
   keep in sync; a washed-out light rendering is what the first version got
   wrong.
-- **The block art** is drawn on canvas by `voxels()`, a small painter's-
-  algorithm renderer. A scene is just a list of `{x, y, z, colour}` cubes run
-  through `order()` so nearer cubes paint last. Two scenes use it: the hero
-  island and the build plot on the server card.
+- **The heart ledger** in the hero is the page's one signature element: twenty
+  slots, ten filled, and a single scripted pass on load showing a kill adding a
+  heart and a death taking it back. It sits still under `prefers-reduced-motion`.
+- **The pixel icons** (hearts, feature tiles, `og.png`) all come from one set of
+  16x16 masks in `tools/icons.py`, which prints an SVG sprite. Edit a mask as
+  ASCII art, re-run it, and paste the sprite back into `index.html`.
+- **The block art** on the server card is drawn on canvas by `voxels()`, a small
+  painter's-algorithm renderer. A scene is a list of `{x, y, z, colour}` cubes
+  run through `order()` so nearer cubes paint last.
 - **Live player count and player heads** come from `api.mcstatus.io` and
   degrade to the plain server address if that request fails.
 
@@ -36,8 +42,8 @@ just add an object and push:
 ## Status
 
 `tools/status.py` runs **on the box**, pings the proxy, the limbo and BrickSMP,
-reads the host's own CPU/memory/disk, and writes `status.json` into the web
-root. A systemd timer runs it every minute.
+reads the host's uptime, and writes `status.json` into the web root. A systemd
+timer runs it every minute.
 
 It deliberately runs server-side rather than from the visitor's browser: the
 servers only listen on the box's own address, and BrickSMP is an external server
@@ -60,7 +66,9 @@ Two places serve this:
   `/.well-known/matrix/*` for the Matrix homeserver; those are exact-match
   locations so they outrank the site's `location /`. Don't remove them.
 - **GitHub Pages** — a mirror at `brick-bread.github.io/brickworks-site`.
-  Pushing to `main` deploys it. No live status there.
+  Pushing to `main` deploys it. No live status there. Asset paths are relative so
+  the subpath works; only the `og:image` is absolute, and it deliberately points
+  at brickworks.world so shared links preview the real site.
 
 ## Note
 
