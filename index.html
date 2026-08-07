@@ -170,70 +170,80 @@
     <div class="head">
       <p class="kicker">/features</p>
       <h2>What's on it</h2>
-      <p class="sub">The stuff you'll actually use once you're in.</p>
+      <p class="sub">Twelve slots. Hover or tap one, like you'd read any item.</p>
     </div>
-    <ul class="tiles">
-      <li class="tile" style="--c:#FF4D57">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-heart"/></svg>
-        <h3>Hearts</h3>
-        <p><code>/withdraw</code> pulls hearts out of yourself as items. Carry them, trade them, or hand them over when someone has you cornered.</p>
-      </li>
-      <li class="tile" style="--c:#FF6A3D">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-target"/></svg>
-        <h3>Bounties</h3>
-        <p>Put your own money on someone's head and let the server come after them. <code>/bounties</code> to set one or see who's worth hunting.</p>
-      </li>
-      <li class="tile" style="--c:#4FD6E0">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-team"/></svg>
-        <h3>Teams</h3>
-        <p>Run with people instead of getting jumped by them. <code>/team</code> to make one or get invited into one.</p>
-      </li>
-      <li class="tile" style="--c:#B77DFF">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-gem"/></svg>
-        <h3>Gems</h3>
-        <p>Earned just for playing, and spent in <code>/gemshop</code> on crate keys and ranks. Buying them is optional, playing gets you there too.</p>
-      </li>
-      <li class="tile" style="--c:#FFC857">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-coins"/></svg>
-        <h3>The shop</h3>
-        <p>Sell what you don't need, buy what you do. One currency across the whole server, and prices move because players move them.</p>
-      </li>
-      <li class="tile" style="--c:#8BE454">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-paddle"/></svg>
-        <h3>Auction house</h3>
-        <p>Put your gear up and let people bid on it. Beats spamming prices in chat at 2am.</p>
-      </li>
-      <li class="tile" style="--c:#4FD6E0">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-swap"/></svg>
-        <h3>Trading</h3>
-        <p>Both inventories lock until you both hit confirm, so nobody runs off with your diamonds halfway through.</p>
-      </li>
-      <li class="tile" style="--c:#B77DFF">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-chest"/></svg>
-        <h3>Vaults and spawners</h3>
-        <p>Storage you can get at from anywhere, and spawners that sit in a menu instead of a wall of blocks lagging your base.</p>
-      </li>
-      <li class="tile" style="--c:#FF6A3D">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-crate"/></svg>
-        <h3>Crates</h3>
-        <p>Keys drop for playing and for voting. Link your Discord to your account in game and you get one for that too.</p>
-      </li>
-      <li class="tile" style="--c:#3FA7F0">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-pin"/></svg>
-        <h3>Random teleport</h3>
-        <p>Drops you somewhere nobody has touched yet, for when everything near spawn is taken.</p>
-      </li>
-      <li class="tile" style="--c:#FF4D57">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-house"/></svg>
-        <h3>Homes and warps</h3>
-        <p><code>/sethome</code> so you've got somewhere to run back to, and public warps for the places worth knowing about.</p>
-      </li>
-      <li class="tile" style="--c:#C9BBD4">
-        <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-shield"/></svg>
-        <h3>Anticheat</h3>
-        <p>Runs on the server, not your client. It catches killaura and reach without punishing you for having bad ping.</p>
-      </li>
-    </ul>
+    <!-- A chest of item slots with one shared tooltip, the way the game
+         itself presents what you own. Each slot carries its copy as data
+         attributes; the tooltip is just where it gets read out. -->
+    <div class="chest-wrap">
+      <div class="chest" role="group" aria-label="Server features">
+        <button type="button" class="slot" style="--c:#FF4D57" aria-label="Hearts"
+          data-name="Hearts" data-cmd="/withdraw"
+          data-lore="Pull hearts out of yourself as items. Carry them, trade them, or hand them over when someone has you cornered.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-heart"/></svg>
+        </button>
+        <button type="button" class="slot" style="--c:#FF6A3D" aria-label="Bounties"
+          data-name="Bounties" data-cmd="/bounties"
+          data-lore="Put your own money on someone's head and let the server come after them. Set one, or see who's worth hunting.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-target"/></svg>
+        </button>
+        <button type="button" class="slot" style="--c:#4FD6E0" aria-label="Teams"
+          data-name="Teams" data-cmd="/team"
+          data-lore="Run with people instead of getting jumped by them. Make one, or get invited into one.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-team"/></svg>
+        </button>
+        <button type="button" class="slot" style="--c:#B77DFF" aria-label="Gems"
+          data-name="Gems" data-cmd="/gemshop"
+          data-lore="Earned just for playing, and spent on crate keys and ranks. Buying them is optional — playing gets you there too.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-gem"/></svg>
+        </button>
+        <button type="button" class="slot" style="--c:#FFC857" aria-label="The shop"
+          data-name="The shop"
+          data-lore="Sell what you don't need, buy what you do. One currency across the whole server, and prices move because players move them.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-coins"/></svg>
+        </button>
+        <button type="button" class="slot" style="--c:#8BE454" aria-label="Auction house"
+          data-name="Auction house"
+          data-lore="Put your gear up and let people bid on it. Beats spamming prices in chat at 2am.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-paddle"/></svg>
+        </button>
+        <button type="button" class="slot" style="--c:#4FD6E0" aria-label="Trading"
+          data-name="Trading"
+          data-lore="Both inventories lock until you both hit confirm, so nobody runs off with your diamonds halfway through.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-swap"/></svg>
+        </button>
+        <button type="button" class="slot" style="--c:#B77DFF" aria-label="Vaults and spawners"
+          data-name="Vaults and spawners"
+          data-lore="Storage you can get at from anywhere, and spawners that sit in a menu instead of a wall of blocks lagging your base.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-chest"/></svg>
+        </button>
+        <button type="button" class="slot" style="--c:#FF6A3D" aria-label="Crates"
+          data-name="Crates"
+          data-lore="Keys drop for playing and for voting. Link your Discord to your account in game and you get one for that too.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-crate"/></svg>
+        </button>
+        <button type="button" class="slot" style="--c:#3FA7F0" aria-label="Random teleport"
+          data-name="Random teleport"
+          data-lore="Drops you somewhere nobody has touched yet, for when everything near spawn is taken.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-pin"/></svg>
+        </button>
+        <button type="button" class="slot" style="--c:#FF4D57" aria-label="Homes and warps"
+          data-name="Homes and warps" data-cmd="/sethome"
+          data-lore="Somewhere to run back to, and public warps for the places worth knowing about.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-house"/></svg>
+        </button>
+        <button type="button" class="slot" style="--c:#C9BBD4" aria-label="Anticheat"
+          data-name="Anticheat"
+          data-lore="Runs on the server, not your client. It catches killaura and reach without punishing you for having bad ping.">
+          <svg class="ico" aria-hidden="true" viewBox="0 0 16 16"><use href="#i-shield"/></svg>
+        </button>
+      </div>
+      <div class="tip" role="region" aria-live="polite" aria-label="Item description">
+        <p class="tip-name" id="tip-name" style="color:#FF4D57">Hearts</p>
+        <p class="tip-lore" id="tip-lore">Pull hearts out of yourself as items. Carry them, trade them, or hand them over when someone has you cornered.</p>
+        <p class="tip-cmd" id="tip-cmd">/withdraw</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -270,18 +280,19 @@
       <p class="kicker">/rules</p>
       <h2>The short version</h2>
     </div>
-    <ul class="rules">
-      <li class="rule"><b>No cheating</b><p>No cheat clients, no macros, nothing playing the game for you. Bots get you banned across the whole network, not warned.</p></li>
-      <li class="rule"><b>Nothing outside the game</b><p>Phishing links, account selling and real-money scams. Raid people all you like, but keep it in Minecraft.</p></li>
-      <li class="rule"><b>13 and over</b><p>You have to be 13 to play here. Anything involving minors gets reported, not moderated.</p></li>
-      <li class="rule"><b>Don't stack alts</b><p>There's a cap on how many accounts you can run, and evading a ban doesn't reset anything.</p></li>
-    </ul>
-    <p class="note">The full list is in game under <code>/rules</code> and pinned in Discord. If that and this page ever disagree, go with the in-game one.</p>
+    <!-- The rules the way the server actually says them: in chat. -->
+    <div class="chat">
+      <p><b class="srv">[Server]</b> <b class="rule-name">No cheating.</b> No cheat clients, no macros, nothing playing the game for you. Bots get you banned across the whole network, not warned.</p>
+      <p><b class="srv">[Server]</b> <b class="rule-name">Nothing outside the game.</b> Phishing links, account selling and real-money scams. Raid people all you like, but keep it in Minecraft.</p>
+      <p><b class="srv">[Server]</b> <b class="rule-name">13 and over.</b> You have to be 13 to play here. Anything involving minors gets reported, not moderated.</p>
+      <p><b class="srv">[Server]</b> <b class="rule-name">Don't stack alts.</b> There's a cap on how many accounts you can run, and evading a ban doesn't reset anything.</p>
+      <p class="chat-in">/rules for the full list in game &mdash; if it and this page ever disagree, the in-game one wins.</p>
+    </div>
   </div>
 </section>
 
 <section class="join" aria-labelledby="join-h">
-  <div class="dither" aria-hidden="true"></div>
+  <svg class="join-heart" viewBox="0 0 16 16" aria-hidden="true"><use href="#i-heart"/></svg>
   <div class="wrap">
     <p class="kicker">/play</p>
     <h2 id="join-h">Your first ten hearts<br>are already waiting</h2>
@@ -303,22 +314,13 @@
       <p class="kicker">/msg staff</p>
       <h2>Get hold of us</h2>
     </div>
-    <div class="contact">
-      <div class="card">
-        <p class="kicker">Email</p>
-        <a href="mailto:staff@brickworks.world">staff@brickworks.world</a>
-        <p>Ban appeals, reports, or anything you'd rather have in writing.</p>
-      </div>
-      <div class="card">
-        <p class="kicker">Discord</p>
-        <a href="https://discord.brickworks.world" rel="noopener">discord.brickworks.world</a>
-        <p>Support, announcements, and where we post about wipes before they happen. Worth being in for that alone.</p>
-      </div>
-      <div class="card">
-        <p class="kicker">Store</p>
-        <a href="https://brickworks.tebex.io/" rel="noopener">brickworks.tebex.io</a>
-        <p>Gems, and nothing else. You spend them in <code>/gemshop</code> on keys and ranks, and you can earn them just by playing, so buying is a shortcut rather than a wall.</p>
-      </div>
+    <div class="reach">
+      <p><b>Email</b> <a href="mailto:staff@brickworks.world">staff@brickworks.world</a>
+        <span>Ban appeals, reports, or anything you'd rather have in writing.</span></p>
+      <p><b>Discord</b> <a href="https://discord.brickworks.world" rel="noopener">discord.brickworks.world</a>
+        <span>Support, announcements, and where wipes get posted before they happen. Worth being in for that alone.</span></p>
+      <p><b>Store</b> <a href="https://brickworks.tebex.io/" rel="noopener">brickworks.tebex.io</a>
+        <span>Gems, and nothing else. You spend them in <code>/gemshop</code> on keys and ranks, and you can earn them just by playing.</span></p>
     </div>
   </div>
 </section>

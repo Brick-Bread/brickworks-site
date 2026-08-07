@@ -22,7 +22,10 @@ The page draws in the game's own UI language, taken seriously:
 - **Minecraft's two border treatments, and no others**: a raised bevel
   (`--bevel-up`) for things you press, a sunken slot (`--bevel-slot`) for
   things that hold something. Corners are square everywhere because the game
-  has none. Headlines carry the game's hard one-step text shadow.
+  has none. Headlines carry the game's hard one-step text shadow, and every
+  shadow on the page is a hard offset — no blur, no glow, no gradient fills
+  on controls. The hero's atmosphere is drawn on canvas as a dithered pixel
+  horizon with drifting embers, not a gradient wash.
 - **Section eyebrows are the in-game commands they correspond to**
   (`/features`, `/rules`, `/status`), set in the mono face.
 - **The heart ledger** in the hero is the signature element: twenty slots, ten
@@ -32,6 +35,12 @@ The page draws in the game's own UI language, taken seriously:
 - **The server-list row** under the hero CTA is the multiplayer screen entry,
   wired to the live player count. The kill feed below the hero is decorative,
   in the game's death-message grammar, with invented names.
+- **Features are a chest**: twelve item slots feeding one shared tooltip
+  styled after the in-game item tooltip (near-black, purple inner border).
+  Slots are buttons; hover, focus and tap all drive it, and each slot's copy
+  lives in its `data-*` attributes.
+- **Rules render as server chat** — translucent line-by-line, `[Server]`
+  prefix, with the pointer to `/rules` as the input line.
 
 ## Fonts
 

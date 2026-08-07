@@ -162,6 +162,30 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
   track.innerHTML = half + half;
 })();
 
+/* The chest: one tooltip, read from whichever slot has the pointer or
+   focus, like the game reads an item. -------------------------------- */
+(() => {
+  const slots = document.querySelectorAll('.slot');
+  const name = $('tip-name'), lore = $('tip-lore'), cmd = $('tip-cmd');
+  let current = null;
+  const show = btn => {
+    if (current === btn) return;
+    if (current) delete current.dataset.sel;
+    current = btn; btn.dataset.sel = '';
+    name.textContent = btn.dataset.name;
+    name.style.color = btn.style.getPropertyValue('--c');
+    lore.textContent = btn.dataset.lore;
+    cmd.hidden = !btn.dataset.cmd;
+    cmd.textContent = btn.dataset.cmd || '';
+  };
+  for (const btn of slots) {
+    btn.addEventListener('mouseenter', () => show(btn));
+    btn.addEventListener('focus', () => show(btn));
+    btn.addEventListener('click', () => show(btn));
+  }
+  if (slots.length) show(slots[0]);
+})();
+
 /* Updates, newest first, from updates.json ------------------------------- */
 (async () => {
   const log = $('log');
@@ -217,18 +241,46 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
   }
 })();
 
-/* Embers behind the hero: pixel sparks drifting up off the horizon glow.
-   Under reduced motion they are painted once and left still. */
+/* Embers behind the hero: pixel sparks drifting up off a dithered horizon —
+   the gradient drawn the way the game would draw it, in cells, not a wash.
+   Under reduced motion everything is painted once and left still. */
 (() => {
   const cv = $('embers'), ctx = cv.getContext('2d');
   const COLORS = ['#FF6A3D', '#FF4D57', '#FFC857', '#6b4a75'];
-  let W = 0, H = 0, sparks = [];
+  let W = 0, H = 0, sparks = [], horizon = null;
+
+  function drawHorizon() {
+    horizon = document.createElement('canvas');
+    horizon.width = Math.max(1, Math.ceil(W)); horizon.height = Math.max(1, Math.ceil(H));
+    const hx = horizon.getContext('2d');
+    const CELL = 4, top = H * .62;
+    // deepest bands first; the odd ember cell only near the very bottom
+    const TONES = [
+      { c: '#20101C', bias: 0 },
+      { c: '#331424', bias: .30 },
+      { c: '#4A1A28', bias: .55 },
+      { c: '#7E2A2A', bias: .78 },
+      { c: '#B3402A', bias: .93 },
+    ];
+    for (let y = top; y < H; y += CELL) {
+      const t = (y - top) / (H - top);          // 0 at the top of the band, 1 at the floor
+      for (let x = 0; x < W; x += CELL) {
+        const r = Math.random();
+        let tone = null;
+        for (const k of TONES) if (t > k.bias && r < (t - k.bias) * 1.6) tone = k;
+        if (!tone) continue;
+        hx.fillStyle = tone.c;
+        hx.fillRect(x, y, CELL, CELL);
+      }
+    }
+  }
 
   function size() {
     const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
     W = r.width; H = r.height;
     cv.width = W * dpr; cv.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawHorizon();
     sparks = Array.from({ length: Math.min(70, W / 14) }, () => spawn(true));
   }
 
@@ -246,6 +298,7 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
   function paint() {
     ctx.clearRect(0, 0, W, H);
+    if (horizon) ctx.drawImage(horizon, 0, 0, W, H);
     for (const p of sparks) {
       // sparks fade as they climb out of the glow
       ctx.globalAlpha = p.a * Math.min(1, (H - p.y) / H + .35);
