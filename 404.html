@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>You died! — BrickWorks Network</title>
+<meta name="description" content="This page doesn't exist. Respawn at brickworks.world.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2B0A10">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23FF4D57' d='M3 1h3v1h-3zM9 1h3v1h-3zM2 2h5v1h-5zM8 2h5v1h-5zM1 3h14v1h-14zM1 4h14v1h-14zM1 5h14v1h-14zM1 6h14v1h-14zM3 7h10v1h-10zM4 8h8v1h-8zM5 9h6v1h-6zM6 10h4v1h-4zM7 11h2v1h-2z'/%3E%3Cpath fill='%23C42B44' d='M1 7h2v1h-2zM13 7h2v1h-2zM2 8h2v1h-2zM12 8h2v1h-2zM3 9h2v1h-2zM11 9h2v1h-2zM4 10h2v1h-2zM10 10h2v1h-2zM5 11h2v1h-2zM9 11h2v1h-2zM6 12h4v1h-4zM7 13h2v1h-2z'/%3E%3C/svg%3E">
+<style>
+/* The death screen. Self-contained on purpose: a 404 can be served from any
+   path on either host, so nothing here points at another file. */
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;display:grid;place-items:center;
+  background:#2B0A10;
+  /* the game's red wash is dithered, so this one is too */
+  background-image:conic-gradient(rgba(0,0,0,.25) 90deg,transparent 90deg 180deg,
+    rgba(0,0,0,.25) 180deg 270deg,transparent 270deg);
+  background-size:8px 8px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:#F4ECE2;text-align:center;
+}
+main{display:flex;flex-direction:column;align-items:center;gap:1.3rem;padding:2rem}
+h1{
+  margin:0;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-weight:800;font-size:clamp(3rem,10vw,5.5rem);line-height:1;
+  letter-spacing:-.015em;text-shadow:.05em .06em 0 rgba(0,0,0,.6);
+}
+.score{font-size:1.15rem;color:#FFC857;margin:0}
+p{margin:0;color:#D8B9BC;max-width:38ch;line-height:1.6}
+.acts{display:flex;flex-wrap:wrap;gap:.9rem;justify-content:center;margin-top:.7rem}
+a{
+  display:inline-block;padding:1rem 1.8rem;text-decoration:none;
+  font-weight:700;font-size:1rem;color:#F4ECE2;background:#5A2028;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.16),inset 2px 0 0 rgba(255,255,255,.07),
+    inset 0 -2px 0 rgba(0,0,0,.45),inset -2px 0 0 rgba(0,0,0,.28),0 4px 0 #1D060A;
+}
+a:hover{background:#6E2731}
+a:active{transform:translateY(4px);box-shadow:inset 0 2px 0 rgba(255,255,255,.16),
+  inset 2px 0 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),
+  inset -2px 0 0 rgba(0,0,0,.28),0 0 0 #1D060A}
+:focus-visible{outline:3px solid #FFC857;outline-offset:3px}
+</style>
+</head>
+<body>
+<main>
+  <h1>You died!</h1>
+  <p class="score">Score: 404</p>
+  <p>This page doesn't exist &mdash; or it did, and somebody griefed it.
+  No claims, no rollbacks.</p>
+  <div class="acts">
+    <a href="/">Respawn</a>
+    <a href="https://discord.brickworks.world" rel="noopener">Title screen</a>
+  </div>
+</main>
+</body>
+</html>

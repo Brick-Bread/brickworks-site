@@ -1,0 +1,491 @@
+/* BrickWorks — BrickSMP lifesteal.
+   The design language is the game's own UI, drawn like a poster: obsidian
+   ground, the MOTD's ember→kiln fire as the brand gradient, heart-red for
+   everything lifesteal, and Minecraft's bevel grammar as the only border
+   treatment. Corners are square everywhere because the game has none. */
+
+/* Bricolage Grotesque, weight axis 400–800 with its optical axis kept, so
+   headlines get the tight display cut and small labels the readable one from
+   the same file. */
+@font-face{
+  font-family:"BW Display";
+  src:url("../fonts/bw-display.woff2") format("woff2");
+  font-weight:400 800;font-style:normal;font-display:swap;
+}
+/* JetBrains Mono carries everything the game itself would render: commands,
+   coordinates, the kill feed, timestamps. */
+@font-face{
+  font-family:"BW Mono";
+  src:url("../fonts/bw-mono.woff2") format("woff2");
+  font-weight:400 700;font-style:normal;font-display:swap;
+}
+
+/* Every colour is painted explicitly; there is no light variant to keep in
+   sync. All text tones clear 4.5:1 on every ground they sit on. */
+:root{
+  --void:#0D080D;        /* page — near-black with a red undertone, not navy */
+  --obsidian:#160F18;    /* banded sections */
+  --slab:#201626;        /* panels */
+  --slab-2:#2A1D31;      /* panels, lit */
+  --seam:#3A2A44;        /* edges */
+
+  --bone:#F4ECE2;        /* text — warm, not blue-white */
+  --ash:#B9A9BE;         /* dim text */
+  --faint:#A08FAB;       /* small labels */
+
+  --heart:#FF4D57;       /* lifesteal */
+  --blood:#C42B44;       /* its shade */
+  --ember:#FF6A3D;       /* the MOTD gradient — matches the in-game list */
+  --kiln:#FFC857;
+  --xp:#8BE454;          /* “online”, and nothing else */
+
+  --fire:linear-gradient(90deg,var(--ember),var(--kiln));
+
+  --display:"BW Display","Helvetica Neue",Arial,sans-serif;
+  --body:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:"BW Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+
+  /* Minecraft’s two border treatments, and no others: a raised bevel for
+     things you press, a sunken slot for things that hold something. */
+  --bevel-up:inset 0 2px 0 rgba(255,255,255,.16),inset 2px 0 0 rgba(255,255,255,.07),
+             inset 0 -2px 0 rgba(0,0,0,.45),inset -2px 0 0 rgba(0,0,0,.28);
+  --bevel-slot:inset 2px 2px 0 rgba(0,0,0,.55),inset -2px -2px 0 rgba(255,255,255,.05),
+               0 0 0 1px var(--seam);
+
+  --pad:clamp(1.15rem,4vw,3.5rem);
+  --wrap:80rem;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--void);color:var(--bone);
+  font-family:var(--body);font-size:1.02rem;line-height:1.62;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+a{color:inherit}
+p{margin:0}
+:focus-visible{outline:3px solid var(--kiln);outline-offset:3px}
+
+/* Type. The display face is heavy and sentence-case — the shouting is done by
+   weight, not caps. Headlines carry the game’s hard one-step text shadow. */
+h1,h2,h3{font-family:var(--display);margin:0}
+h1,h2{font-weight:800;line-height:.98;letter-spacing:-.015em;text-shadow:.045em .05em 0 rgba(0,0,0,.55)}
+h1{font-size:clamp(2.7rem, 1.2rem + 5vw, 5rem)}
+h1 em{font-style:normal;color:var(--heart);text-shadow:.045em .05em 0 #3d0b12}
+h2{font-size:clamp(1.9rem, 1.15rem + 2.8vw, 3.1rem)}
+h3{font-weight:700;font-size:1.28rem;line-height:1.18;letter-spacing:-.005em}
+
+/* Section eyebrows are the in-game commands they correspond to. */
+.kicker{
+  font-family:var(--mono);font-weight:700;font-size:.88rem;letter-spacing:.04em;
+  color:var(--kiln);margin:0;
+}
+.kicker::before{content:"> ";color:var(--faint);font-weight:400}
+
+.gain{color:var(--xp)}
+.loss{color:var(--heart)}
+/* Chat-prompt cursor on section eyebrows */
+.head .kicker::after{
+  content:"";display:inline-block;width:.5em;height:1em;margin-left:.3em;
+  background:currentColor;vertical-align:-.12em;
+  animation:blink 1.3s steps(1) infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+.wrap{max-width:var(--wrap);margin:0 auto;padding-inline:var(--pad)}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+/* Pixel-icon fills. Selectors can't reach inside a <use> clone, but custom
+   properties inherit through it — so every icon context sets --i-a/--i-b and
+   these two rules, matched on the sprite originals, resolve them per use. */
+.a{fill:var(--i-a,currentColor)}
+.b{fill:var(--i-b,currentColor)}
+.skip{position:absolute;left:-9999px;top:0;background:var(--slab);color:var(--bone);
+  padding:.8rem 1.1rem;z-index:99;font-family:var(--mono)}
+.skip:focus{left:.5rem;top:.5rem}
+
+/* Scroll progress as the XP bar: ten segments, hard notches. */
+.xp{position:fixed;top:0;left:0;right:0;height:4px;z-index:30;
+  background:rgba(0,0,0,.4);pointer-events:none}
+.xp b{display:block;height:100%;width:0;background:var(--xp);
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.35)}
+.xp::after{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,
+    transparent 0 calc(10% - 2px),var(--void) calc(10% - 2px) 10%)}
+
+/* Advancement toast, top right, when the address gets copied. */
+.toast{
+  position:fixed;top:5.4rem;right:1rem;z-index:40;
+  display:flex;align-items:center;gap:.85rem;
+  background:var(--slab);box-shadow:var(--bevel-up),0 4px 0 #0A060A;
+  padding:.8rem 1.25rem .9rem 1rem;pointer-events:none;
+  transform:translateX(calc(100% + 2rem));transition:transform .25s ease;
+  --i-a:var(--kiln);--i-b:#C79A2E;
+}
+.toast[data-show]{transform:none}
+.toast svg{width:1.7rem;height:1.7rem;flex:none}
+.toast b{display:block;font-family:var(--mono);font-weight:700;font-size:.85rem;color:var(--kiln)}
+.toast span{font-family:var(--mono);font-size:.8rem;color:var(--ash)}
+@media (prefers-reduced-motion:reduce){.toast{transform:none;visibility:hidden}
+  .toast[data-show]{visibility:visible}}
+
+/* Dithered edges: the game’s way of blending two grounds. */
+.dither{
+  height:8px;
+  background:
+    conic-gradient(var(--void) 90deg,transparent 90deg 180deg,var(--void) 180deg 270deg,transparent 270deg)
+    0 0/8px 8px;
+}
+
+/* ── Buttons: Minecraft buttons, recoloured ─────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.6rem;
+  font-family:var(--display);font-weight:700;font-size:1rem;letter-spacing:.01em;
+  padding:1rem 1.7rem;text-decoration:none;border:0;cursor:pointer;
+  border-radius:0;white-space:nowrap;
+  transition:transform .1s ease,box-shadow .1s ease,background-color .15s ease;
+}
+.btn-hot{
+  background:var(--ember);color:#2A1006;
+  box-shadow:var(--bevel-up),0 4px 0 #7E2A12;
+}
+.btn-hot:hover{filter:saturate(1.15) brightness(1.05)}
+.btn-hot:active{transform:translateY(4px);box-shadow:var(--bevel-up),0 0 0 #7E2A12}
+.btn-cool{
+  background:var(--slab-2);color:var(--bone);
+  box-shadow:var(--bevel-up),0 4px 0 #120B15;
+}
+.btn-cool:hover{background:#33243c}
+.btn-cool:active{transform:translateY(4px);box-shadow:var(--bevel-up),0 0 0 #120B15}
+
+/* The address + copy control */
+.ip{
+  display:flex;align-items:stretch;
+  background:var(--void);box-shadow:var(--bevel-slot);
+}
+.ip code{
+  font-family:var(--mono);font-size:clamp(.95rem,.9rem + .35vw,1.1rem);
+  display:flex;align-items:center;padding:0 1.2rem;color:var(--bone);white-space:nowrap;
+}
+.ip button{
+  font-family:var(--display);font-weight:700;font-size:.98rem;
+  border:0;cursor:pointer;padding:1rem 1.5rem;margin:4px;
+  background:var(--ember);color:#2A1006;
+  box-shadow:var(--bevel-up);
+  transition:filter .15s ease;
+}
+.ip button:hover{filter:saturate(1.15) brightness(1.05)}
+.ip button[data-done]{background:var(--xp);color:#12310A}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.top{
+  position:sticky;top:0;z-index:20;
+  background:rgba(13,8,13,.86);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--seam);
+}
+.top .wrap{display:flex;align-items:center;gap:1.4rem;height:4.4rem}
+.brand{display:flex;align-items:center;gap:.65rem;text-decoration:none;margin-right:auto}
+.brand-mark{--i-a:var(--ember);--i-b:var(--blood)}
+.brand span{font-family:var(--display);font-weight:800;font-size:1.28rem;letter-spacing:-.01em;color:var(--bone)}
+.top nav{display:flex;gap:1.5rem}
+.top nav a{
+  font-family:var(--mono);font-size:.88rem;
+  text-decoration:none;color:var(--faint);transition:color .15s ease;
+}
+.top nav a:hover,.top nav a[data-active]{color:var(--kiln)}
+.top .btn{padding:.6rem 1.05rem;font-size:.9rem}
+.top .btn-hot{box-shadow:var(--bevel-up),0 3px 0 #7E2A12}
+.top .btn-cool{box-shadow:var(--bevel-up),0 3px 0 #120B15}
+/* Narrow screens keep the section links — they drop below the brand and
+   scroll sideways rather than hiding behind a menu button. */
+@media (max-width:900px){
+  .top .wrap{flex-wrap:wrap;height:auto;padding-block:.8rem;gap:.7rem 1rem}
+  .top nav{order:3;width:100%;gap:1.3rem;overflow-x:auto;padding-bottom:.15rem;scrollbar-width:none}
+  .top nav::-webkit-scrollbar{display:none}
+  .top nav a{white-space:nowrap}
+}
+@media (max-width:420px){.top .btn-cool{display:none}}
+
+/* ── Hero ───────────────────────────────────────────────────────────── */
+/* Flat ground; the atmosphere is the canvas — pixel embers over a dithered
+   horizon, no gradient washes. The join band shares the same sky, so the
+   page opens and closes on the same world. */
+.hero{position:relative;isolation:isolate;overflow:hidden;background:#140D16}
+.sky{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block}
+.hero-grid{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);
+  gap:clamp(1.75rem,4vw,3.5rem);align-items:center;
+  padding-block:clamp(2.75rem,5.5vw,4.75rem);
+}
+.hero-copy{display:flex;flex-direction:column;align-items:flex-start;gap:1.5rem;min-width:0}
+.sell{font-size:clamp(1.05rem,1rem + .4vw,1.24rem);color:var(--ash);max-width:46ch}
+.cta{display:flex;flex-wrap:wrap;gap:.9rem}
+
+/* The multiplayer-screen row, live. */
+.mc-row{
+  display:flex;align-items:center;gap:.9rem;width:100%;max-width:34rem;
+  background:rgba(13,8,13,.8);box-shadow:var(--bevel-slot);
+  padding:.65rem .9rem .65rem .65rem;margin-top:.35rem;
+}
+.mc-icon{
+  flex:none;width:3rem;height:3rem;display:grid;place-items:center;
+  background:var(--slab);box-shadow:var(--bevel-slot);
+}
+.mc-icon svg{width:2rem;height:2rem}
+.mc-icon{--i-a:var(--heart);--i-b:var(--blood)}
+.mc-lines{display:flex;flex-direction:column;gap:.1rem;min-width:0;margin-right:auto}
+.mc-name{font-family:var(--mono);font-weight:700;font-size:.95rem;color:var(--bone);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-motd{
+  font-family:var(--mono);font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  background:var(--fire);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.mc-meta{flex:none;display:flex;align-items:center;gap:.6rem}
+.mc-count{font-family:var(--mono);font-size:.85rem;color:var(--faint);font-variant-numeric:tabular-nums}
+.mc-count b{color:var(--xp);font-weight:400}
+.mc-ping{display:flex;align-items:flex-end;gap:2px;height:14px}
+.mc-ping i{width:3px;background:var(--xp);opacity:.35}
+.mc-ping i:nth-child(1){height:4px}.mc-ping i:nth-child(2){height:6px}
+.mc-ping i:nth-child(3){height:9px}.mc-ping i:nth-child(4){height:11px}
+.mc-ping i:nth-child(5){height:14px}
+.mc-row[data-live] .mc-ping i{opacity:1}
+.mc-row[data-down] .mc-ping i{background:var(--blood);opacity:1;height:3px}
+.under-row{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap}
+.row-note{font-size:.86rem;color:var(--faint)}
+.heads{display:flex;padding-left:.4rem}
+.heads img{
+  width:1.9rem;height:1.9rem;margin-left:-.4rem;
+  image-rendering:pixelated;box-shadow:0 0 0 2px var(--void);background:var(--slab);
+}
+
+/* The ledger */
+.ledger{
+  min-width:0;background:rgba(22,15,24,.92);box-shadow:var(--bevel-slot),10px 10px 0 rgba(0,0,0,.3);
+  padding:clamp(1.25rem,2.5vw,1.9rem);display:flex;flex-direction:column;gap:1.05rem;
+}
+.ledger-top{display:flex;align-items:baseline;justify-content:space-between;gap:1rem}
+.count{font-family:var(--mono);color:var(--faint);font-variant-numeric:tabular-nums}
+.count .cap{font-size:1.05rem}
+.count b{font-family:var(--display);font-size:2.3rem;font-weight:800;color:var(--bone);
+  transition:color .3s ease;line-height:1}
+.count b[data-gain]{color:var(--xp)}
+.count b[data-loss]{color:var(--heart)}
+.hearts{display:grid;grid-template-columns:repeat(10,1fr);gap:.4rem}
+.hearts span{--i-a:#241A29;--i-b:#1A1220;display:block;aspect-ratio:1}
+.hearts span[data-on]{--i-a:var(--heart);--i-b:var(--blood)}
+.hearts span[data-in]{--i-a:var(--kiln);--i-b:#C79A2E}
+.hearts span[data-out]{--i-a:#4A2333;--i-b:#33192a}
+.hearts svg{display:block;width:100%;height:100%}
+.ledger-note{font-family:var(--mono);font-size:.88rem;line-height:1.55;color:var(--ash);min-height:2.7em}
+.ledger-note b{color:var(--bone);font-weight:400}
+.ledger-acts{display:flex;flex-wrap:wrap;gap:.6rem}
+.act{
+  flex:1 1 auto;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  font-family:var(--mono);font-weight:700;font-size:.88rem;color:var(--bone);
+  background:var(--slab-2);border:0;cursor:pointer;padding:.75rem .9rem;
+  box-shadow:var(--bevel-up),0 3px 0 #120B15;
+  transition:transform .1s ease,box-shadow .1s ease,background-color .15s ease;
+}
+.act:hover{background:#33243c}
+.act:active{transform:translateY(3px);box-shadow:var(--bevel-up),0 0 0 #120B15}
+.act b{font-weight:700}
+.act-cmd{color:var(--kiln)}
+.ledger-inv{display:flex;align-items:center;gap:.9rem}
+.ledger-inv[hidden]{display:none}
+.inv-slot{
+  position:relative;flex:none;width:3.4rem;height:3.4rem;display:grid;place-items:center;
+  background:var(--void);border:0;cursor:pointer;box-shadow:var(--bevel-slot);
+}
+.inv-slot:hover{background:#1a1119}
+.inv-slot svg{width:2.1rem;height:2.1rem}
+.inv-slot{--i-a:var(--kiln);--i-b:#C79A2E}
+.inv-slot b{
+  position:absolute;right:.15rem;bottom:0;
+  font-family:var(--mono);font-weight:700;font-size:.85rem;color:var(--bone);
+  text-shadow:1px 1px 0 #000;
+}
+.inv-note{font-family:var(--mono);font-size:.8rem;color:var(--faint);line-height:1.5}
+@media (max-width:960px){
+  .hero-grid{grid-template-columns:1fr}
+}
+
+/* ── Kill feed ──────────────────────────────────────────────────────── */
+.feed{
+  overflow:hidden;background:var(--obsidian);border-bottom:1px solid var(--seam);
+  padding-block:.7rem;
+}
+.feed-track{display:flex;gap:2.75rem;width:max-content;animation:feed 60s linear infinite}
+.feed-track:hover{animation-play-state:paused}
+.feed span{
+  font-family:var(--mono);font-size:.82rem;color:var(--faint);white-space:nowrap;
+  display:inline-flex;align-items:center;gap:.5rem;
+}
+.feed b{color:var(--ash);font-weight:400}
+.feed .gain{color:var(--xp)}
+.feed svg{width:.8rem;height:.8rem;flex:none}
+.feed .f-gain{--i-a:var(--heart);--i-b:var(--blood)}
+.feed .f-env{--i-a:#4A2333;--i-b:#33192a}
+.feed .f-wd{--i-a:var(--kiln);--i-b:#C79A2E}
+@keyframes feed{to{transform:translateX(-50%)}}
+
+/* ── Sections ───────────────────────────────────────────────────────── */
+section{padding-block:clamp(3.25rem,5vw,5rem)}
+#features,#rules{background:var(--obsidian);border-block:1px solid var(--seam)}
+.head{display:flex;flex-direction:column;gap:.8rem;margin-bottom:clamp(1.75rem,3vw,2.5rem);max-width:52ch}
+.head .sub{color:var(--ash);font-size:1.06rem}
+
+/* The deal: one segmented strip, like a HUD bar — not three cards ------ */
+.econ{display:flex;flex-wrap:wrap;gap:1px;background:var(--seam);
+  box-shadow:0 0 0 1px var(--seam),8px 8px 0 rgba(0,0,0,.25);
+  list-style:none;margin:0;padding:0}
+.eco{
+  background:var(--slab);flex:1 1 16rem;
+  padding:1.5rem 1.6rem 1.7rem;display:flex;flex-direction:column;gap:.6rem;
+}
+.eco-sign{font-family:var(--mono);font-weight:700;font-size:1.7rem;line-height:1;
+  display:inline-flex;align-items:center;gap:.4rem;
+  text-shadow:2px 2px 0 rgba(0,0,0,.5)}
+.eco-sign svg{width:.85em;height:.85em}
+.eco-sign.gain{--i-a:var(--heart);--i-b:var(--blood)}
+.eco-sign.loss{--i-a:#4A2333;--i-b:#33192a}
+.eco-sign.cmd{color:var(--kiln);font-size:1.35rem;padding-top:.35rem}
+.eco h3{color:var(--bone)}
+.eco p{color:var(--ash);font-size:.97rem}
+.truths{display:grid;grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));gap:1.5rem 2.75rem;margin-top:1.75rem}
+.truth{
+  border-left:4px solid var(--heart);
+  padding:.3rem 0 .3rem 1.3rem;display:flex;flex-direction:column;gap:.55rem;
+}
+.truth h3{color:var(--bone)}
+.truth p{color:var(--ash);font-size:.97rem}
+.tags{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.4rem}
+.tag{
+  font-family:var(--mono);font-size:.82rem;padding:.45rem .8rem;
+  background:var(--void);color:var(--ash);box-shadow:var(--bevel-slot);
+}
+.tag b{color:var(--kiln);font-weight:400}
+
+/* The chest ------------------------------------------------------------
+   Twelve item slots and one tooltip, the way the game presents an
+   inventory. The tooltip panel is styled after the in-game item tooltip:
+   near-black, purple inner border. */
+.eco code,.reach code{font-family:var(--mono);font-size:.92em;color:var(--kiln)}
+.chest-wrap{display:grid;grid-template-columns:auto minmax(0,1fr);
+  gap:clamp(1.5rem,3.5vw,3rem);align-items:start}
+.chest{
+  display:grid;grid-template-columns:repeat(6,3.6rem);gap:.45rem;
+  background:var(--slab);padding:1rem;box-shadow:var(--bevel-up),0 6px 0 #0A060A;
+}
+.slot{
+  width:3.6rem;height:3.6rem;display:grid;place-items:center;padding:0;
+  background:#171019;border:0;cursor:pointer;box-shadow:var(--bevel-slot);
+  transition:background-color .12s ease;
+}
+.slot:hover{background:#241A29}
+.slot[data-sel]{background:#241A29;box-shadow:var(--bevel-slot),inset 0 0 0 2px rgba(244,236,226,.5)}
+.ico{width:30px;height:30px;flex:none;display:block;image-rendering:pixelated;
+  --i-a:var(--c);--i-b:color-mix(in srgb,var(--c) 52%,#0D080D)}
+.tip{
+  min-height:9.5em;max-width:34rem;justify-self:start;
+  background:rgba(16,6,22,.96);
+  border:3px solid rgba(10,4,14,.9);box-shadow:inset 0 0 0 2px #6C3FA6;
+  padding:1.15rem 1.35rem;
+}
+.tip-name{font-family:var(--mono);font-weight:700;font-size:1.05rem}
+.tip-lore{font-family:var(--mono);font-size:.88rem;line-height:1.6;color:var(--ash);
+  margin-top:.5rem;max-width:52ch}
+.tip-cmd{font-family:var(--mono);font-size:.88rem;color:var(--kiln);margin-top:.65rem}
+.tip-cmd[hidden]{display:none}
+@media (max-width:780px){
+  .chest-wrap{grid-template-columns:1fr}
+  .chest{grid-template-columns:repeat(4,minmax(2.9rem,3.6rem));justify-content:start}
+  .slot{width:auto;aspect-ratio:1;height:auto}
+  .tip{min-height:0}
+}
+
+/* Updates + status share one band: neither carries enough content to own
+   a full section, and side by side they read as the ops column. -------- */
+.duo{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);
+  gap:clamp(2.25rem,4.5vw,4.5rem);align-items:start}
+.h-sm{font-size:1.5rem;letter-spacing:0}
+.sub-sm{font-size:.95rem}
+.duo .head{margin-bottom:1.4rem}
+@media (max-width:880px){.duo{grid-template-columns:1fr}}
+
+/* Updates -------------------------------------------------------------- */
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px;
+  background:var(--seam);box-shadow:0 0 0 1px var(--seam)}
+.entry{background:var(--obsidian);padding:1.35rem 1.5rem;display:grid;
+  grid-template-columns:8.5rem minmax(0,1fr);gap:.35rem 1.5rem;align-items:baseline}
+.entry time{font-family:var(--mono);font-size:.82rem;color:var(--faint);white-space:nowrap}
+.entry h3{color:var(--bone);font-size:1.1rem}
+.entry p{grid-column:2;color:var(--ash);font-size:.95rem}
+@media (max-width:640px){
+  .entry{grid-template-columns:1fr}
+  .entry p{grid-column:1}
+}
+
+/* Status ---------------------------------------------------------------- */
+.svcs{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:1px;
+  background:var(--seam);box-shadow:0 0 0 1px var(--seam)}
+.svc{background:var(--slab);padding:1.1rem 1.35rem;flex:1 1 13rem;
+  display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap}
+.svc-name{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--bone);margin-right:auto}
+.dot-s{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--mono);
+  font-size:.78rem;color:var(--faint);white-space:nowrap}
+.dot-s::before{content:"";width:.55rem;height:.55rem;background:var(--faint);
+  flex:none;transform:translateY(1px)}
+.svc[data-up="yes"] .dot-s{color:var(--xp)}
+.svc[data-up="yes"] .dot-s::before{background:var(--xp)}
+.svc[data-up="no"] .dot-s{color:var(--heart)}
+.svc[data-up="no"] .dot-s::before{background:var(--heart)}
+.svc .plain{flex-basis:100%;font-family:var(--mono);font-size:.83rem;color:var(--ash)}
+.stamp{margin-top:1.2rem;color:var(--faint);font-size:.85rem;font-family:var(--mono)}
+
+/* Rules: the server chat ------------------------------------------------ */
+.chat{display:flex;flex-direction:column;gap:3px;max-width:62rem}
+.chat p{
+  font-family:var(--mono);font-size:.92rem;line-height:1.55;color:var(--ash);
+  background:rgba(0,0,0,.42);padding:.55rem .85rem;width:fit-content;max-width:100%;
+}
+.chat .srv{color:var(--kiln);font-weight:700}
+.chat .rule-name{color:var(--bone);font-weight:700}
+.chat .chat-in{width:100%;margin-top:.65rem;color:var(--faint);background:rgba(0,0,0,.6)}
+.chat .chat-in::before{content:"> "}
+
+/* Join band: the same sky the page opened on ---------------------------- */
+.join{
+  position:relative;isolation:isolate;overflow:hidden;background:#140D16;
+  border-block:1px solid var(--seam);
+  padding-block:clamp(4rem,7vw,6.5rem);
+}
+.join .wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;gap:1.4rem}
+.join .sub{color:var(--ash);max-width:46ch;font-size:1.08rem}
+
+/* Contact --------------------------------------------------------------- */
+.reach{display:flex;flex-direction:column;gap:1.35rem;max-width:60rem}
+.reach p{display:grid;grid-template-columns:6.5rem minmax(0,1fr);gap:.3rem 1.5rem;align-items:baseline}
+.reach b{font-family:var(--mono);font-weight:700;font-size:.88rem;color:var(--kiln)}
+.reach a{font-family:var(--mono);color:var(--bone);text-decoration:none;
+  justify-self:start;border-bottom:2px solid var(--ember);overflow-wrap:anywhere}
+.reach a:hover{color:var(--kiln)}
+.reach span{grid-column:2;color:var(--ash);font-size:.95rem}
+@media (max-width:560px){
+  .reach p{grid-template-columns:1fr}
+  .reach span{grid-column:1}
+}
+
+/* Footer ---------------------------------------------------------------- */
+footer{border-top:1px solid var(--seam);background:#0A060A}
+footer .wrap{display:flex;flex-wrap:wrap;gap:1rem 2rem;align-items:center;
+  justify-content:space-between;padding-block:2.4rem;color:var(--faint);font-size:.87rem}
+footer nav{display:flex;flex-wrap:wrap;gap:1.3rem}
+footer a{color:var(--ash);text-decoration:none}
+footer a:hover{color:var(--bone)}
+footer .legal{max-width:40ch;line-height:1.5}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+}
